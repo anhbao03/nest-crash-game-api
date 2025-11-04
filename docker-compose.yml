@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: crash-game-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: crash_game
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - crash-game-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: crash-game-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    networks:
+      - crash-game-network
+
+  # Uncomment to run the app in Docker
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: crash-game-api
+  #   restart: unless-stopped
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     - NODE_ENV=development
+  #     - DB_HOST=postgres
+  #     - DB_PORT=5432
+  #     - DB_USERNAME=postgres
+  #     - DB_PASSWORD=postgres
+  #     - DB_DATABASE=crash_game
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   networks:
+  #     - crash-game-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  crash-game-network:
+    driver: bridge
